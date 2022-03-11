@@ -1,0 +1,27 @@
+#cloud-config
+#
+hostname: k3s-controller
+fqdn: k3s-controller.local
+groups:
+  - k3s: [root]
+users:
+  - name: k3s
+    primary_group: k3s
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    expiredate: '2032-09-01'
+    lock_passwd: false
+chpasswd:
+  list: |
+    root:password
+    k3s:password
+  expire: false
+write_files:
+  - owner: root
+    content: |
+      #!/bin/bash
+      curl -sfL https://get.k3s.io | K3S_TOKEN=kryptonite sh -
+    path: /run/first_boot
+runcmd:
+  - [ "/bin/bash", "/run/first_boot" ]
+
